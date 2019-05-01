@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+        mysql:
+                image: mysql:5.7.23
+                env_file:
+                        - .env
+                ports:
+                        - ${DB_HOST}:${DB_PORT}:3306
+                volumes:
+                        - ./tmp/mysql:/var/lib/mysql
+                        - ./migrations:/docker-entrypoint-initdb.d
+                environment:
+                        - MYSQL_ROOT_PASSWORD=123456
+                        - MYSQL_USER=${DB_USER}
+                        - MYSQL_PASSWORD=${DB_PASS}
+                        - MYSQL_DATABASE=${DB_NAME}

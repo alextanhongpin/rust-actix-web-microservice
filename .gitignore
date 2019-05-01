@@ -2,3 +2,6 @@
 **/*.rs.bk
 
 .env
+
+# Exclude mysql tmp directory.
+tmp/

@@ -1,27 +1,17 @@
 extern crate diesel;
 extern crate dotenv;
-extern crate r2d2;
 extern crate r2d2_mysql;
-extern crate r2d2_diesel;
 
 use actix_web::{web, App, HttpServer, Responder};
-use diesel::mysql::MysqlConnection;
 use dotenv::dotenv;
 use std::env;
-use r2d2_diesel::{ConnectionManager};
-use r2d2::{Pool};
+use r2d2_mysql::mysql::{from_row};
 
-pub type DBPool = Pool<ConnectionManager<MysqlConnection>>;
-pub struct DbExecutor(pub DBPool);
+mod db;
+mod model;
 
 fn index(info: web::Path<(u32, String)>) -> impl Responder {
     format!("hello {} id: {}", info.1, info.0)
-}
-
-fn init_pool(database_url: &str) -> DBPool {
-    // Set default config for connection pool.
-    let manager = ConnectionManager::<MysqlConnection>::new(database_url);
-    Pool::builder().build(manager).expect("failed to create pool")
 }
 
 fn main() -> std::io::Result<()> {
@@ -29,7 +19,23 @@ fn main() -> std::io::Result<()> {
     dotenv().ok();
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");
-    let pool = init_pool(&database_url);
+    let pool = db::init_pool(&database_url);
+
+    {
+        let mut conn = pool.get().unwrap();
+        let posts: Vec<model::Post> = conn.prep_exec("SELECT * FROM post", ()).map(|result| {
+            result.map(|x| x.unwrap()).map(|row| {
+                let (id, title, body, published) = from_row(row);
+                model::Post{
+                    id,
+                    title,
+                    body,
+                    published
+                }
+            }).collect()
+        }).unwrap();
+        println!("got posts: {:?}", posts);
+    }
 
     HttpServer::new(
         move || App::new()
