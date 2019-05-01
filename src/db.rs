@@ -1,6 +1,7 @@
 extern crate mysql;
 extern crate r2d2;
 extern crate r2d2_mysql;
+// use actix::{SyncContext};
 
 use r2d2_mysql::mysql::{Opts,OptsBuilder};
 use std::sync::Arc;
@@ -9,6 +10,11 @@ use r2d2_mysql::pool::MysqlConnectionManager;
 pub type Pool = r2d2::Pool<MysqlConnectionManager>;
 
 // pub struct DbExecutor(pub Pool);
+
+// impl Actor for DbExecutor {
+//     type context = SyncContext<Self>;
+// }
+
 
 pub fn init_pool(db_url: &str) -> Arc<Pool> {
     let opts = Opts::from_url(db_url).unwrap();

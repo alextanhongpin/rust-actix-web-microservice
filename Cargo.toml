@@ -5,10 +5,15 @@ authors = ["alextanhongpin <alextan220990@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+actix= "0.8.1"
 actix-web = "1.0.0-beta.2"
 diesel = { version = "1.4.2", features = ["mysql"] }
 dotenv = "0.13.0"
 r2d2 = "0.8.4"
+futures = "0.1.26"
+serde = "1.0.90"
+serde_derive = "1.0.90"
+serde_json = "1.0.39"
 
 [dependencies.r2d2_mysql]
 git = "https://github.com/outersky/r2d2-mysql"
